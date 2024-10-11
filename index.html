@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Quiz Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        #quiz-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            margin-top: 20px;
+        }
+        #animal-image {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+        .answer {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #eee;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .answer:hover {
+            background-color: #ddd;
+        }
+        .correct { color: green; font-size: 20px; }
+        .wrong { color: red; font-size: 20px; }
+        #final-container {
+            display: none;
+        }
+        #score {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Animal Quiz Game</h1>
+
+    <div id="quiz-container">
+        <img id="animal-image" src="" alt="Animal Image">
+        <p id="question"></p>
+        <button class="answer" id="answer1"></button>
+        <button class="answer" id="answer2"></button>
+        <button class="answer" id="answer3"></button>
+        <button class="answer" id="answer4"></button>
+        <p id="feedback"></p>
+        <p id="score"></p>
+    </div>
+
+    <div id="final-container">
+        <h2>Final Score</h2>
+        <p id="final-score"></p>
+        <!-- <h3>Wrong Answers:</h3>
+        <ul id="wrong-answers"></ul> -->
+        <button id="restart">Restart Quiz</button>
+    </div>
+
+    <script>
+        // Questions with animal images and options
+        let questions = [
+    { image: "giraffe.jpg", answers: ["Lion", "Elephant", "Giraffe", "Zebra"], correct: 2 },
+    { image: "duck.jpg", answers: ["Duck", "Donkey", "Camel", "Dog"], correct: 0 },
+    { image: "donkey.jpg", answers: ["Horse", "Donkey", "Camel", "Dog"], correct: 1 },
+    { image: "camel.jpg", answers: ["Donkey", "Duck", "Camel", "Lion"], correct: 2 },
+    { image: "lion.jpg", answers: ["Donkey", "Duck", "Dog", "Lion"], correct: 3 },
+    { image: "cat.jpg", answers: ["Donkey", "Cat", "Dog", "Lion"], correct: 1 },
+    { image: "dog.jpg", answers: ["Tiger", "Cat", "Dog", "Lion"], correct: 2 },
+    { image: "elephant.jpg", answers: ["Lion", "Elephant", "Giraffe", "Rhino"], correct: 1 },
+    { image: "tiger.jpg", answers: ["Tiger", "Leopard", "Cheetah", "Lion"], correct: 0 },
+    { image: "zebra.jpg", answers: ["Zebra", "Horse", "Giraffe", "Deer"], correct: 0 },
+    { image: "bear.jpg", answers: ["Panda", "Lion", "Bear", "Tiger"], correct: 2 },
+    { image: "koala.jpg", answers: ["Koala", "Bear", "Monkey", "Panda"], correct: 0 },
+    { image: "rhino.jpg", answers: ["Elephant", "Rhino", "Hippo", "Camel"], correct: 1 },
+    { image: "panda.jpg", answers: ["Koala", "Bear", "Panda", "Tiger"], correct: 2 },
+    { image: "horse.jpg", answers: ["Zebra", "Horse", "Donkey", "Camel"], correct: 1 },
+    { image: "wolf.jpg", answers: ["Dog", "Fox", "Wolf", "Coyote"], correct: 2 },
+    { image: "fox.jpg", answers: ["Dog", "Wolf", "Fox", "Coyote"], correct: 2 },
+    { image: "cheetah.jpg", answers: ["Leopard", "Cheetah", "Tiger", "Lion"], correct: 1 },
+    { image: "leopard.jpg", answers: ["Leopard", "Cheetah", "Jaguar", "Tiger"], correct: 0 },
+    { image: "penguin.jpg", answers: ["Duck", "Penguin", "Ostrich", "Swan"], correct: 1 },
+    { image: "swan.jpg", answers: ["Duck", "Goose", "Swan", "Pelican"], correct: 2 }
+];
+
+
+        let currentQuestion = 0;
+        let score = 0;
+        let wrongAnswers = [];
+
+        function loadQuestion() {
+            if (currentQuestion < questions.length) {
+                let questionObj = questions[currentQuestion];
+                document.getElementById('animal-image').src = questionObj.image;
+                document.getElementById('answer1').textContent = questionObj.answers[0];
+                document.getElementById('answer2').textContent = questionObj.answers[1];
+                document.getElementById('answer3').textContent = questionObj.answers[2];
+                document.getElementById('answer4').textContent = questionObj.answers[3];
+                document.getElementById('feedback').textContent = '';
+            } else {
+                // Quiz finished
+                showFinalScore();
+            }
+        }
+
+        function checkAnswer(selectedAnswer) {
+            let questionObj = questions[currentQuestion];
+            if (selectedAnswer === questionObj.correct) {
+                document.getElementById('feedback').textContent = '✔ Correct!';
+                document.getElementById('feedback').classList = 'correct';
+                score++;
+            } else {
+                document.getElementById('feedback').textContent = '✘ Wrong!';
+                document.getElementById('feedback').classList = 'wrong';
+                wrongAnswers.push(`Image: ${questionObj.image}, Correct Answer: ${questionObj.answers[questionObj.correct]}`);
+            }
+
+            currentQuestion++;
+            setTimeout(loadQuestion, 1500); // Wait 1.5 seconds before moving to the next question
+        }
+
+        function showFinalScore() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('final-container').style.display = 'block';
+            document.getElementById('final-score').textContent = `You scored ${score} out of ${questions.length} (${(score / questions.length * 100).toFixed(2)}%)`;
+
+            let wrongList = document.getElementById('wrong-answers');
+            wrongAnswers.forEach(function(item) {
+                let li = document.createElement('li');
+                li.textContent = item;
+                wrongList.appendChild(li);
+            });
+        }
+
+        // Attach event listeners to the answer buttons
+        document.querySelectorAll('.answer').forEach(function(button, index) {
+            button.addEventListener('click', function() {
+                checkAnswer(index);
+            });
+        });
+
+        // Restart quiz button functionality
+        document.getElementById('restart').addEventListener('click', function() {
+            currentQuestion = 0;
+            score = 0;
+            wrongAnswers = [];
+            document.getElementById('final-container').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            loadQuestion(); // Reload the first question
+        });
+
+        loadQuestion(); // Start the quiz
+    </script>
+
+</body>
+</html>
